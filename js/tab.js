@@ -16,6 +16,7 @@
   var Tab = function (element) {
     // jscs:disable requireDollarBeforejQueryAssignment
     this.element = $(element)
+    this.element.showing = null
     // jscs:enable requireDollarBeforejQueryAssignment
   }
 
@@ -47,6 +48,7 @@
     $this.trigger(showEvent)
 
     if (showEvent.isDefaultPrevented() || hideEvent.isDefaultPrevented()) return
+    if (this.showing) return
 
     var $target = $(selector)
 
@@ -60,15 +62,16 @@
         type: 'shown.bs.tab',
         relatedTarget: $previous[0]
       })
+      $this.showing = false
     })
   }
 
   Tab.prototype.activate = function (element, container, callback) {
+    this.element.showing = true
     var $active    = container.find('> .active')
     var transition = callback
       && $.support.transition
       && ($active.length && $active.hasClass('fade') || !!container.find('> .fade').length)
-
     function next() {
       $active
         .removeClass('active')
